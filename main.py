@@ -1,14 +1,29 @@
-def main():
-    from openpyxl import load_workbook, Workbook
+def select_pairs(sock_count, usage_probability, max_cycle):
     from time import time
     from washFunctions import wash_pairs
     from utility import count_values
-    from dataFunctions import save_data
 
-    # from dataFunctions import save_age_count_data
     start_time = time()
 
-    #
+    # Get the age of the socks
+    sock_ages = wash_pairs(sock_count, usage_probability, max_cycle)
+
+    # Convert it to number of socks with a certain age
+    age_count = count_values(sock_ages)
+
+    print(f"The simulation of 'selecting pair' was successfully executed in {time() - start_time:.3f} seconds!"
+          f"\nIt simulated {sock_count} sock(s) with a probability of usage"
+          f" {usage_probability * 100}% per pair for {max_cycle} cycle(s).")
+
+    return age_count
+
+
+def main(pairs=True, singles=True):
+    from openpyxl import Workbook
+    from time import time
+    from dataFunctions import save_data
+
+    # File constants
     FILE_PATH = "data/"
     FILE_END = "-raw_data.xlsx"
 
@@ -26,35 +41,31 @@ def main():
         print("Invalid input")
         return
 
-    # Get the age of the socks
-    sock_ages = wash_pairs(SOCK_COUNT, USAGE_PROBABILITY, MAX_CYCLE)
+    if pairs:
+        # Get the age count for selecting pairs
+        age_count = select_pairs(SOCK_COUNT, USAGE_PROBABILITY, MAX_CYCLE)
 
-    # Convert it to number of socks with a certain age
-    age_count = count_values(sock_ages)
+        # Save the data
+        # Workbook for raw data
+        workbook = Workbook()
+        worksheet = workbook.active
+        worksheet.title = "Data"
 
-    print(f"The simulation was successfully executed in {time() - start_time:.3f} seconds!"
-          f"\nIt simulated {SOCK_COUNT} sock(s) with a probability of usage"
-          f" {USAGE_PROBABILITY * 100}% per pair for {MAX_CYCLE} cycle(s).")
-    start_time = time()
+        # Data column titles
+        worksheet.cell(row=1, column=1, value="Age")
+        worksheet.cell(row=1, column=2, value="Number of Socks")
 
-    # Save the data
-    # Workbook for raw data
-    workbook = Workbook()
-    worksheet = workbook.active
-    worksheet.title = "Data"
+        # Save the data
+        save_data(worksheet, age_count, 1, 2)
 
-    # Data column titles
-    worksheet.cell(row=1, column=1, value="Age")
-    worksheet.cell(row=1, column=2, value="Number of Socks")
+        # Save the files with the ending 'FILE_END'
+        workbook.save(FILE_PATH + "selecting_pairs" + FILE_END)
 
-    # Save the data
-    save_data(worksheet, age_count, 1, 2)
+        print(f"\nThe data of 'selecting pair' was saved to '{FILE_PATH}selecting_pairs{FILE_END}'.")
 
-    # Save the files with the ending 'FILE_END'
-    workbook.save(FILE_PATH + "selecting_pairs" + FILE_END)
-
-    print(f"\nThe data were saved to '{FILE_PATH}selecting_pairs{FILE_END}' in {time() - start_time} seconds!")
+    if singles:
+        pass
 
 
 if __name__ == '__main__':
-    main()
+    main(singles=False)
