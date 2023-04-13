@@ -46,5 +46,4 @@ def wash_singles(sock_count: int, probability_of_usage: float, max_cycle: int):
             prob = random()
             if prob < probability_of_usage:
                 selection.append(selected)  # Add selected to "washing machine"
-        print(len(selection))
     return sock_ages
