@@ -1,4 +1,4 @@
-def select_pairs(sock_count, usage_probability, max_cycle):
+def select_pairs(sock_count: int, usage_probability: float, max_cycle: int, run: int):
     from time import time
     from washFunctions import wash_pairs
     from utility import count_values
@@ -11,14 +11,14 @@ def select_pairs(sock_count, usage_probability, max_cycle):
     # Convert it to number of socks with a certain age
     age_count = count_values(sock_ages)
 
-    print(f"The simulation of 'selecting pair' was successfully executed in {time() - start_time:.3f} seconds!"
+    print(f"The simulation of 'selecting pair'#{run} was successfully executed in {time() - start_time:.3f} seconds!"
           f"\nIt simulated {sock_count} sock(s) with a probability of usage"
           f" {usage_probability * 100}% per pair for {max_cycle} cycle(s).")
 
-    return age_count
+    return [sock_ages, age_count]
 
 
-def select_singles(sock_count, usage_probability, max_cycle):
+def select_singles(sock_count: int, usage_probability: float, max_cycle: int, run: int):
     from time import time
     from washFunctions import wash_singles
     from utility import count_values
@@ -31,15 +31,16 @@ def select_singles(sock_count, usage_probability, max_cycle):
     # Convert it to number of socks with a certain age
     age_count = count_values(sock_ages)
 
-    print(f"The simulation of 'selecting singles' was successfully executed in {time() - start_time:.3f} seconds!"
+    print(f"The simulation of 'selecting singles'#{run} was successfully executed in {time() - start_time:.3f} seconds!"
           f"\nIt simulated {sock_count} sock(s) with a probability of usage"
           f" {usage_probability * 100}% per pair for {max_cycle} cycle(s).")
 
-    return age_count
+    return [sock_ages, age_count]
 
 
-def main(pairs=True, singles=True, save=False, parameters=None):
+def main(pairs: bool = True, singles: bool = False, save: bool = False, parameters: dict = None, max_run: int = 1):
     from openpyxl import Workbook
+    from openpyxl.worksheet.table import Table, TableStyleInfo
     from time import time
     from dataFunctions import save_data
 
@@ -47,8 +48,9 @@ def main(pairs=True, singles=True, save=False, parameters=None):
     FILE_PATH = "data/"
     FILE_END = "-raw_data.xlsx"
 
-    # Parameters as inputs
+    # Parameters
     if parameters is None:
+        # Parameters as inputs
         SOCK_COUNT = int(input("Enter total number of pairs: ")) * 2
         if SOCK_COUNT <= 0:
             print("Invalid input")
@@ -67,55 +69,79 @@ def main(pairs=True, singles=True, save=False, parameters=None):
         USAGE_PROBABILITY = parameters["USAGE_PROBABILITY"]
         MAX_CYCLE = parameters["MAX_CYCLE"]
 
+    workbook = worksheet = None
     if pairs:
-        # Get the age count for selecting pairs
-        age_count = select_pairs(SOCK_COUNT, USAGE_PROBABILITY, MAX_CYCLE)
-
         if save:
-            # Save the data
             # Workbook for raw data
             workbook = Workbook()
             worksheet = workbook.active
             worksheet.title = "Data"
 
-            # Data column titles
-            worksheet.cell(row=1, column=1, value="Age")
-            worksheet.cell(row=1, column=2, value="Number of Socks")
+        for run in range(max_run):
+            # Get the age count for selecting pairs
+            [sock_ages, age_count] = select_pairs(SOCK_COUNT, USAGE_PROBABILITY, MAX_CYCLE, run + 1)
 
-            # Save the data
-            save_data(worksheet, age_count, 1, 2)
+            if save:
+                # Data column titles
+                worksheet.cell(row=(SOCK_COUNT + 2) * run + 1, column=1, value="Sock")
+                worksheet.cell(row=(SOCK_COUNT + 2) * run + 1, column=2, value="Age")
 
-            # Save the files with the ending 'FILE_END'
-            workbook.save(FILE_PATH + "selecting_pairs" + FILE_END)
+                # Save the data
+                save_data(worksheet, sock_ages, 1, (SOCK_COUNT + 2) * run + 2)
+                # Create the table
+                tab = Table(displayName=f"PairsTable{run + 1}", ref=f"A{(SOCK_COUNT + 2) * run + 1}"
+                                                                    f":B{(SOCK_COUNT + 2) * (run + 1) - 1}")
 
-            print(f"The data of 'selecting pair' was saved to '{FILE_PATH}selecting_pairs{FILE_END}'.\n\n")
-        else:
-            print(age_count)
+                # Add a default style with striped rows and banded columns
+                style = TableStyleInfo(name="TableStyleMedium9", showFirstColumn=False,
+                                       showLastColumn=False, showRowStripes=True, showColumnStripes=True)
+                tab.tableStyleInfo = style  # Apply the style
+
+                # Add table to the worksheet
+                worksheet.add_table(tab)
+                # Save the files with the ending 'FILE_END'
+                workbook.save(FILE_PATH + "selecting_pairs" + FILE_END)
+
+                print(f"The data of 'selecting pair' was saved to '{FILE_PATH}selecting_pairs{FILE_END}'.\n\n")
+            else:
+                print(sock_ages)
 
     if singles:
-        # Get the age count for selecting pairs
-        age_count = select_singles(SOCK_COUNT, USAGE_PROBABILITY, MAX_CYCLE)
-
         if save:
-            # Save the data
             # Workbook for raw data
             workbook = Workbook()
             worksheet = workbook.active
             worksheet.title = "Data"
 
-            # Data column titles
-            worksheet.cell(row=1, column=1, value="Age")
-            worksheet.cell(row=1, column=2, value="Number of Socks")
+        for run in range(max_run):
+            # Get the age count for selecting pairs
+            [sock_ages, age_count] = select_singles(SOCK_COUNT, USAGE_PROBABILITY, MAX_CYCLE, run + 1)
 
-            # Save the data
-            save_data(worksheet, age_count, 1, 2)
+            if save:
+                # Data column titles
+                worksheet.cell(row=1, column=1, value="Sock")
+                worksheet.cell(row=1, column=2, value="Age")
 
-            # Save the files with the ending 'FILE_END'
-            workbook.save(FILE_PATH + "selecting_singles" + FILE_END)
+                # Save the data
+                save_data(worksheet, sock_ages, 1, (SOCK_COUNT + 2) * run + 2)
+                # Create the table
+                tab = Table(displayName=f"SinglesTable{run}", ref=f"A{(SOCK_COUNT + 2) * run + 1}"
+                                                                  f":B{(SOCK_COUNT + 2) * (run + 1) - 1}")
 
-            print(f"The data of 'selecting singles' was saved to '{FILE_PATH}selecting_singles{FILE_END}'.\n\n")
-        else:
-            print(age_count)
+                # Add a default style with striped rows and banded columns
+                style = TableStyleInfo(name="TableStyleMedium9", showFirstColumn=False,
+                                       showLastColumn=False, showRowStripes=True, showColumnStripes=True)
+                tab.tableStyleInfo = style  # Apply the style
+
+                # Add table to the worksheet
+                worksheet.add_table(tab)
+
+                # Save the files with the ending 'FILE_END'
+                workbook.save(FILE_PATH + "selecting_singles" + FILE_END)
+
+                print(f"The data of 'selecting singles' was saved to '{FILE_PATH}selecting_singles{FILE_END}'.\n\n")
+            else:
+                print(sock_ages)
 
 
 if __name__ == '__main__':
@@ -128,4 +154,5 @@ if __name__ == '__main__':
         "USAGE_PROBABILITY": 0.2,
         "MAX_CYCLE": 100,
     }
-    main(pairs=True, singles=True, save=True, parameters=parameters)
+
+    main(pairs=True, singles=False, save=True, parameters=parameters, max_run=50)
