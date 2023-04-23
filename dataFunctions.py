@@ -1,12 +1,20 @@
-def save_data(ws, data: dict, start_column: int, start_row: int):
+def save_data(ws, data: list, start_column: int, start_row: int):
     from openpyxl import load_workbook, Workbook
 
     idx = 0
-    for key in data.keys():
-        # Save the keys to first column of the worksheet starting from the second row
-        ws.cell(row=start_row + idx, column=start_column, value=key)
+    for idx in range(len(data)):
+        ws.cell(row=start_row + idx, column=start_column, value=data[idx])
 
-        # Save the values to second column of the worksheet starting from the second row
-        ws.cell(row=start_row + idx, column=start_column + 1, value=data[key])
 
-        idx += 1
+def convert_to_column(idx: int):
+    idx -= 1
+    column = ""
+    while idx > 25:
+        rem = idx % 26
+
+        column = chr(65 + rem) + column
+        idx = (idx // 26) - 1
+
+    column = chr(65 + idx) + column
+
+    return column

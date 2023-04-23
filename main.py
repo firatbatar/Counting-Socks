@@ -41,8 +41,7 @@ def select_singles(sock_count: int, usage_probability: float, max_cycle: int, ru
 def main(pairs: bool = True, singles: bool = False, save: bool = False, parameters: dict = None, max_run: int = 1):
     from openpyxl import Workbook
     from openpyxl.worksheet.table import Table, TableStyleInfo
-    from time import time
-    from dataFunctions import save_data
+    from dataFunctions import save_data, convert_to_column
 
     # File constants
     FILE_PATH = "data/"
@@ -76,6 +75,8 @@ def main(pairs: bool = True, singles: bool = False, save: bool = False, paramete
             workbook = Workbook()
             worksheet = workbook.active
             worksheet.title = "Data"
+            worksheet.cell(row=1, column=1, value="Sock")
+            save_data(worksheet, [i for i in range(1, SOCK_COUNT + 1)], 1, 2)
 
         for run in range(max_run):
             # Get the age count for selecting pairs
@@ -83,28 +84,28 @@ def main(pairs: bool = True, singles: bool = False, save: bool = False, paramete
 
             if save:
                 # Data column titles
-                worksheet.cell(row=(SOCK_COUNT + 2) * run + 1, column=1, value="Sock")
-                worksheet.cell(row=(SOCK_COUNT + 2) * run + 1, column=2, value="Age")
+                worksheet.cell(row=1, column=run + 2, value=f"Ages#{run + 1}")
 
                 # Save the data
-                save_data(worksheet, sock_ages, 1, (SOCK_COUNT + 2) * run + 2)
-                # Create the table
-                tab = Table(displayName=f"PairsTable{run + 1}", ref=f"A{(SOCK_COUNT + 2) * run + 1}"
-                                                                    f":B{(SOCK_COUNT + 2) * (run + 1) - 1}")
-
-                # Add a default style with striped rows and banded columns
-                style = TableStyleInfo(name="TableStyleMedium9", showFirstColumn=False,
-                                       showLastColumn=False, showRowStripes=True, showColumnStripes=True)
-                tab.tableStyleInfo = style  # Apply the style
-
-                # Add table to the worksheet
-                worksheet.add_table(tab)
-                # Save the files with the ending 'FILE_END'
-                workbook.save(FILE_PATH + "selecting_pairs" + FILE_END)
-
-                print(f"The data of 'selecting pair' was saved to '{FILE_PATH}selecting_pairs{FILE_END}'.\n\n")
+                save_data(worksheet, list(sock_ages.values()), run + 2, 2)
             else:
                 print(sock_ages)
+
+        if save:
+            # Create the table
+            tab = Table(displayName="PairsTable", ref=f"A1:{convert_to_column(max_run + 1)}{SOCK_COUNT + 1}")
+
+            # Add a default style with striped rows and banded columns
+            style = TableStyleInfo(name="TableStyleMedium9", showFirstColumn=False,
+                                   showLastColumn=False, showRowStripes=True, showColumnStripes=True)
+            tab.tableStyleInfo = style  # Apply the style
+
+            # Add table to the worksheet
+            worksheet.add_table(tab)
+            # Save the files with the ending 'FILE_END'
+            workbook.save(FILE_PATH + "selecting_pairs" + FILE_END)
+
+            print(f"The data of 'selecting pair' was saved to '{FILE_PATH}selecting_pairs{FILE_END}'.\n\n")
 
     if singles:
         if save:
@@ -112,6 +113,8 @@ def main(pairs: bool = True, singles: bool = False, save: bool = False, paramete
             workbook = Workbook()
             worksheet = workbook.active
             worksheet.title = "Data"
+            worksheet.cell(row=1, column=1, value="Sock")
+            save_data(worksheet, [i for i in range(1, SOCK_COUNT + 1)], 1, 2)
 
         for run in range(max_run):
             # Get the age count for selecting pairs
@@ -119,29 +122,29 @@ def main(pairs: bool = True, singles: bool = False, save: bool = False, paramete
 
             if save:
                 # Data column titles
-                worksheet.cell(row=1, column=1, value="Sock")
                 worksheet.cell(row=1, column=2, value="Age")
 
                 # Save the data
-                save_data(worksheet, sock_ages, 1, (SOCK_COUNT + 2) * run + 2)
-                # Create the table
-                tab = Table(displayName=f"SinglesTable{run}", ref=f"A{(SOCK_COUNT + 2) * run + 1}"
-                                                                  f":B{(SOCK_COUNT + 2) * (run + 1) - 1}")
-
-                # Add a default style with striped rows and banded columns
-                style = TableStyleInfo(name="TableStyleMedium9", showFirstColumn=False,
-                                       showLastColumn=False, showRowStripes=True, showColumnStripes=True)
-                tab.tableStyleInfo = style  # Apply the style
-
-                # Add table to the worksheet
-                worksheet.add_table(tab)
-
-                # Save the files with the ending 'FILE_END'
-                workbook.save(FILE_PATH + "selecting_singles" + FILE_END)
-
-                print(f"The data of 'selecting singles' was saved to '{FILE_PATH}selecting_singles{FILE_END}'.\n\n")
+                save_data(worksheet, list(sock_ages.values()), run + 2, 2)
             else:
                 print(sock_ages)
+
+        if save:
+            # Create the table
+            tab = Table(displayName="PairsTable", ref=f"A1:{convert_to_column(max_run + 1)}{SOCK_COUNT + 1}")
+
+            # Add a default style with striped rows and banded columns
+            style = TableStyleInfo(name="TableStyleMedium9", showFirstColumn=False,
+                                   showLastColumn=False, showRowStripes=True, showColumnStripes=True)
+            tab.tableStyleInfo = style  # Apply the style
+
+            # Add table to the worksheet
+            worksheet.add_table(tab)
+
+            # Save the files with the ending 'FILE_END'
+            workbook.save(FILE_PATH + "selecting_singles" + FILE_END)
+
+            print(f"The data of 'selecting singles' was saved to '{FILE_PATH}selecting_singles{FILE_END}'.\n\n")
 
 
 if __name__ == '__main__':
@@ -155,4 +158,4 @@ if __name__ == '__main__':
         "MAX_CYCLE": 100,
     }
 
-    main(pairs=True, singles=False, save=True, parameters=parameters, max_run=50)
+    main(pairs=True, singles=False, save=True, parameters=parameters)
