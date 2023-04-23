@@ -38,9 +38,8 @@ def select_singles(sock_count: int, usage_probability: float, max_cycle: int, ru
     return [sock_ages, age_count]
 
 
-def main(save: bool = False, parameters: dict = None, max_run: int = 1):
-    if len(parameters) != max_run:
-        raise ValueError("Parameters do not match with the number of runs")
+def main(parameters: dict = None, save: bool = False, file_name: str = "selecting_pairs"):
+    MAX_RUN = len(parameters)
 
     from openpyxl import Workbook
     from openpyxl.worksheet.table import Table, TableStyleInfo
@@ -59,12 +58,11 @@ def main(save: bool = False, parameters: dict = None, max_run: int = 1):
         worksheet = workbook.active
         worksheet.title = "Data"
 
-    for run in range(max_run):
+    for run in range(MAX_RUN):
         # Parameters
         SOCK_COUNT = parameters[f"P{run + 1}"]["SOCK_COUNT"]
         USAGE_PROBABILITY = parameters[f"P{run + 1}"]["USAGE_PROBABILITY"]
         MAX_CYCLE = parameters[f"P{run + 1}"]["MAX_CYCLE"]
-
         # Get the age count for selecting pairs
         [sock_ages, age_count] = select_pairs(SOCK_COUNT, USAGE_PROBABILITY, MAX_CYCLE, run + 1)
 
@@ -95,30 +93,20 @@ def main(save: bool = False, parameters: dict = None, max_run: int = 1):
         # Save the files with the ending 'FILE_END'
         workbook.save(FILE_PATH + "selecting_pairs" + FILE_END)
 
-        print(f"The data of 'selecting pair' was saved to '{FILE_PATH}selecting_pairs{FILE_END}'.\n\n")
+        print(f"The data of 'selecting pair' was saved to '{FILE_PATH + file_name + FILE_END}'.\n\n")
 
 
 if __name__ == '__main__':
     import os
+    from utility import parameter_create
     os.system('cls')
 
     # Parameters
-    parameters = {
-        "P1": {
-            "SOCK_COUNT": 50,
-            "USAGE_PROBABILITY": 0.2,
-            "MAX_CYCLE": 100,
-        },
-        "P2": {
-            "SOCK_COUNT": 60,
-            "USAGE_PROBABILITY": 0.2,
-            "MAX_CYCLE": 100,
-        },
-        "P3": {
-            "SOCK_COUNT": 50,
-            "USAGE_PROBABILITY": 0.2,
-            "MAX_CYCLE": 100,
-        }
+    base_parameters = {
+        "SOCK_COUNT": 50,
+        "USAGE_PROBABILITY": 0.2,
+        "MAX_CYCLE": 100,
     }
 
-    main(save=True, parameters=parameters, max_run=3)
+    parameters = parameter_create("SOCK_COUNT", base_parameters, 3, 10)
+    main(save=True, parameters=parameters, file_name="increased_sock_count")
