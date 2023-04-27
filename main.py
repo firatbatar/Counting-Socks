@@ -38,21 +38,27 @@ def select_singles(sock_count: int, usage_probability: float, max_cycle: int, ru
     return [sock_ages, age_count]
 
 
-def main(parameters: dict = None, save: bool = False, file_name: str = "selecting_pairs"):
+def main(parameters: dict = None, save: dict = None, file_name: str = "selecting_pairs"):
     MAX_RUN = len(parameters)
+    if save is None:
+        save = {
+            "is_save": True,
+            "ages": True,
+            "counts": False,
+        }
 
     from openpyxl import Workbook
     from openpyxl.worksheet.table import Table, TableStyleInfo
     from time import time
-    from dataFunctions import save_data
+    from dataFunctions import save_data, save_ages, save_counts
 
     # File constants
     FILE_PATH = "data/"
     FILE_END = "-raw_data.xlsx"
 
     workbook = worksheet = None
-    SOCK_COUNT_OLD = 0
-    if save:
+    count_old = 0
+    if save["is_save"]:
         # Workbook for raw data
         workbook = Workbook()
         worksheet = workbook.active
@@ -66,30 +72,22 @@ def main(parameters: dict = None, save: bool = False, file_name: str = "selectin
         # Get the age count for selecting pairs
         [sock_ages, age_count] = select_pairs(SOCK_COUNT, USAGE_PROBABILITY, MAX_CYCLE, run + 1)
 
-        if save:
-            # Data column titles
-            worksheet.cell(row=SOCK_COUNT_OLD + 1, column=1, value="Sock")
-            worksheet.cell(row=SOCK_COUNT_OLD + 1, column=2, value=f"Age#{run + 1}")
-
-            # Save the data
-            save_data(worksheet, sock_ages, 1, SOCK_COUNT_OLD + 2)
-
-            # Create the table
-            tab = Table(displayName=f"PairsTable{run + 1}", ref=f"A{SOCK_COUNT_OLD + 1}"
-                                                                f":B{SOCK_COUNT_OLD + SOCK_COUNT + 1}")
-            # Add a default style with striped rows and banded columns
-            style = TableStyleInfo(name="TableStyleMedium9", showFirstColumn=False,
-                                   showLastColumn=False, showRowStripes=True, showColumnStripes=True)
-            tab.tableStyleInfo = style  # Apply the style
-            # Add table to the worksheet
-            worksheet.add_table(tab)
+        if save["is_save"]:
+            if save["ages"]:
+                save_ages(worksheet, sock_ages, count_old + 1, 1, str(run + 1))
+                count_old += SOCK_COUNT + 2
+            elif save["counts"]:
+                save_counts(worksheet, age_count, count_old + 1, 1, str(run + 1))
+                count_old += len(age_count) + 2
 
         else:
-            print(sock_ages)
+            if save["ages"]:
+                print(sock_ages)
+            elif save["counts"]:
+                pass
 
-        SOCK_COUNT_OLD += SOCK_COUNT + 2
 
-    if save:
+    if save["is_save"]:
         # Save the files with the ending 'FILE_END'
         workbook.save(FILE_PATH + "selecting_pairs" + FILE_END)
 
@@ -108,5 +106,11 @@ if __name__ == '__main__':
         "MAX_CYCLE": 100,
     }
 
-    parameters = parameter_create("SOCK_COUNT", base_parameters, 3, 10)
-    main(save=True, parameters=parameters, file_name="increased_sock_count")
+    save_arg = {
+        "is_save": True,
+        "ages": True,
+        "counts": False
+    }
+
+    parameters_arg = parameter_create("SOCK_COUNT", base_parameters, 3, 10)
+    main(save=save_arg, parameters=parameters_arg, file_name="increased_sock_count")
