@@ -54,7 +54,8 @@ def save_counts(ws, data: dict, row: int, column: int, title_num: str):
     ws.add_table(tab)
 
 
-def plot_histogram(data: list, title: str = "Title", path: str = "graphs", range_min: int = None, range_max: int = None,  bin_count: int = None, show: bool = False):
+def plot_histogram(data: list, title: str = "Title", path: str = "graphs",
+                   range_min: int = None, range_max: int = None, bin_count: int = None, show: bool = False):
     from matplotlib import pyplot as plt
     from matplotlib.ticker import AutoMinorLocator
     import numpy as np

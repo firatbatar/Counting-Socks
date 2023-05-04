@@ -1,44 +1,10 @@
-def select_pairs(sock_count: int, usage_probability: float, max_cycle: int, run: int):
+def main(parameters: dict = None, save: dict = None, file_name: str = "selecting_pairs", graph_path: str = "graphs"):
+    from openpyxl import Workbook
+    from openpyxl.worksheet.table import Table, TableStyleInfo
     from time import time
-    from washFunctions import wash_pairs
-    from utility import count_values
+    from dataFunctions import save_data, save_ages, save_counts, plot_histogram
+    from utility import select_pairs
 
-    start_time = time()
-
-    # Get the age of the socks
-    sock_ages = wash_pairs(sock_count, usage_probability, max_cycle)
-
-    # Convert it to number of socks with a certain age
-    age_count = count_values(sock_ages)
-
-    print(f"The simulation of 'selecting pair'#{run} was successfully executed in {time() - start_time:.3f} seconds!"
-          f"\nIt simulated {sock_count} sock(s) with a probability of usage"
-          f" {usage_probability * 100}% per pair for {max_cycle} cycle(s).")
-
-    return [sock_ages, age_count]
-
-
-def select_singles(sock_count: int, usage_probability: float, max_cycle: int, run: int):
-    from time import time
-    from washFunctions import wash_singles
-    from utility import count_values
-
-    start_time = time()
-
-    # Get the age of the socks
-    sock_ages = wash_singles(sock_count, usage_probability, max_cycle)
-
-    # Convert it to number of socks with a certain age
-    age_count = count_values(sock_ages)
-
-    print(f"The simulation of 'selecting singles'#{run} was successfully executed in {time() - start_time:.3f} seconds!"
-          f"\nIt simulated {sock_count} sock(s) with a probability of usage"
-          f" {usage_probability * 100}% per pair for {max_cycle} cycle(s).")
-
-    return [sock_ages, age_count]
-
-
-def main(parameters: dict = None, save: dict = None, file_name: str = "selecting_pairs"):
     MAX_RUN = len(parameters)
     if save is None:
         save = {
@@ -46,11 +12,6 @@ def main(parameters: dict = None, save: dict = None, file_name: str = "selecting
             "ages": True,
             "counts": False,
         }
-
-    from openpyxl import Workbook
-    from openpyxl.worksheet.table import Table, TableStyleInfo
-    from time import time
-    from dataFunctions import save_data, save_ages, save_counts, plot_histogram
 
     # File constants
     FILE_PATH = "data/"
@@ -95,11 +56,11 @@ def main(parameters: dict = None, save: dict = None, file_name: str = "selecting
         title = str(save["type"]) + " " + str(parameters[f"P{run + 1}"][save["type"]])
         bin_count = MAX_CYCLE // BIN_WIDTH
         plot_histogram(data=list(sock_ages.values()), bin_count=bin_count, range_min=0, range_max=MAX_CYCLE,
-                       title=title, path="graphs", show=save_arg["show"])
+                       title=title, path=graph_path, show=save_arg["show"])
 
     if save["is_save"]:
         # Save the files with the ending 'FILE_END'
-        workbook.save(FILE_PATH + "selecting_pairs" + FILE_END)
+        workbook.save(FILE_PATH + file_name + FILE_END)
 
         # print(f"The data of 'selecting pair' was saved to '{FILE_PATH + file_name + FILE_END}'.\n\n")
 
@@ -141,12 +102,13 @@ if __name__ == '__main__':
 
     save_arg["type"] = "SOCK_COUNT"
     param_sock_count = parameter_create("SOCK_COUNT", base_param_sock_count, 11, 4)
-    main(save=save_arg, parameters=param_sock_count, file_name="increased_sock_count")
+    main(save=save_arg, parameters=param_sock_count, file_name="increased_sock_count", graph_path="graphs/sock_count/")
 
     # save_arg["type"] = "USAGE_PROBABILITY"
     # param_prob = parameter_create("SOCK_COUNT", base_param_prob, 10, 0.05)
-    # main(save=save_arg, parameters=param_prob, file_name="increased_usage_probability")
+    # main(save=save_arg, parameters=param_prob, file_name="increased_usage_probability",
+    #      graph_path="graphs/usage_probability/")
     #
     # save_arg["type"] = "MAX_CYCLE"
     # param_cycle = parameter_create("SOCK_COUNT", base_param_cycle, 10, 10)
-    # main(save=save_arg, parameters=param_cycle, file_name="increased_cycle")
+    # main(save=save_arg, parameters=param_cycle, file_name="increased_cycle", graph_path="cycle")

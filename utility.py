@@ -56,3 +56,41 @@ def parameter_create(rule: str, start: dict, size: int, step: float = 1):
             parameters[f"P{i}"] = new_param
 
     return parameters
+
+
+def select_pairs(sock_count: int, usage_probability: float, max_cycle: int, run: int):
+    from time import time
+    from washFunctions import wash_pairs
+
+    start_time = time()
+
+    # Get the age of the socks
+    sock_ages = wash_pairs(sock_count, usage_probability, max_cycle)
+
+    # Convert it to number of socks with a certain age
+    age_count = count_values(sock_ages)
+
+    print(f"The simulation of 'selecting pair'#{run} was successfully executed in {time() - start_time:.3f} seconds!"
+          f"\nIt simulated {sock_count} sock(s) with a probability of usage"
+          f" {usage_probability * 100}% per pair for {max_cycle} cycle(s).")
+
+    return [sock_ages, age_count]
+
+
+def select_singles(sock_count: int, usage_probability: float, max_cycle: int, run: int):
+    from time import time
+    from washFunctions import wash_singles
+
+    start_time = time()
+
+    # Get the age of the socks
+    sock_ages = wash_singles(sock_count, usage_probability, max_cycle)
+
+    # Convert it to number of socks with a certain age
+    age_count = count_values(sock_ages)
+
+    print(f"The simulation of 'selecting singles'#{run} was successfully executed in {time() - start_time:.3f} seconds!"
+          f"\nIt simulated {sock_count} sock(s) with a probability of usage"
+          f" {usage_probability * 100}% per pair for {max_cycle} cycle(s).")
+
+    return [sock_ages, age_count]
