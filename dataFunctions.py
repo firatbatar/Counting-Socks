@@ -89,3 +89,4 @@ def plot_histogram(data: list, title: str = "Title", path: str = "graphs",
     plt.savefig(path + f"/{title}.png")
     if show:
         plt.show()
+    plt.close()
