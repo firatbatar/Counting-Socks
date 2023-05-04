@@ -86,7 +86,6 @@ def main(parameters: dict = None, save: dict = None, file_name: str = "selecting
             elif save["counts"]:
                 pass
 
-
     if save["is_save"]:
         # Save the files with the ending 'FILE_END'
         workbook.save(FILE_PATH + "selecting_pairs" + FILE_END)
