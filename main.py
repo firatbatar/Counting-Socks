@@ -53,7 +53,7 @@ def main(parameters: dict = None, save: dict = None, file_name: str = "selecting
                 pass
 
         # Plot to matplotlib
-        title = str(save["type"]) + " " + str(parameters[f"P{run + 1}"][save["type"]])
+        title = str(save["type"]) + " " + f"{parameters[f'P{run + 1}'][save['type']]:.2f}"
         bin_count = MAX_CYCLE // BIN_WIDTH
         plot_histogram(data=list(sock_ages.values()), bin_count=bin_count, range_min=0, range_max=MAX_CYCLE,
                        title=title, path=graph_path, show=save_arg["show"])
@@ -94,7 +94,7 @@ if __name__ == '__main__':
     }
 
     base_param_cycle = {
-        "SOCK_COUNT": 10,
+        "SOCK_COUNT": 30,
         "USAGE_PROBABILITY": 0.2,
         "MAX_CYCLE": 10,
         "BIN_WIDTH": 5
@@ -104,11 +104,11 @@ if __name__ == '__main__':
     param_sock_count = parameter_create("SOCK_COUNT", base_param_sock_count, 11, 4)
     main(save=save_arg, parameters=param_sock_count, file_name="increased_sock_count", graph_path="graphs/sock_count/")
 
-    # save_arg["type"] = "USAGE_PROBABILITY"
-    # param_prob = parameter_create("SOCK_COUNT", base_param_prob, 10, 0.05)
-    # main(save=save_arg, parameters=param_prob, file_name="increased_usage_probability",
-    #      graph_path="graphs/usage_probability/")
-    #
-    # save_arg["type"] = "MAX_CYCLE"
-    # param_cycle = parameter_create("SOCK_COUNT", base_param_cycle, 10, 10)
-    # main(save=save_arg, parameters=param_cycle, file_name="increased_cycle", graph_path="cycle")
+    save_arg["type"] = "USAGE_PROBABILITY"
+    param_prob = parameter_create("USAGE_PROBABILITY", base_param_prob, 10, 0.05)
+    main(save=save_arg, parameters=param_prob, file_name="increased_usage_probability",
+         graph_path="graphs/usage_probability/")
+
+    save_arg["type"] = "MAX_CYCLE"
+    param_cycle = parameter_create("MAX_CYCLE", base_param_cycle, 10, 10)
+    main(save=save_arg, parameters=param_cycle, file_name="increased_cycle", graph_path="graphs/cycle/")
