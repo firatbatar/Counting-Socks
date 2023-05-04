@@ -52,3 +52,39 @@ def save_counts(ws, data: dict, row: int, column: int, title_num: str):
     tab.tableStyleInfo = style  # Apply the style
     # Add table to the worksheet
     ws.add_table(tab)
+
+
+def plot_histogram(data: list, title: str = "Title", path: str = "graphs", range_min: int = None, range_max: int = None,  bin_count: int = None, show: bool = False):
+    from matplotlib import pyplot as plt
+    from matplotlib.ticker import AutoMinorLocator
+    import numpy as np
+
+    if range_min is None:
+        range_min = min(data)
+    if range_max is None:
+        range_max = max(data)
+
+    # plot:
+    fig, ax = plt.subplots()
+
+    if bin_count is not None:
+        _, bins, patches = ax.hist(data, bins=bin_count,  range=(range_min, range_max))
+    else:
+        _, bins, patches = ax.hist(data, bins='auto',  range=(range_min, range_max))
+
+    # x ticks
+    x_ticks = [(bins[idx+1] + value)/2 for idx, value in enumerate(bins[:-1])]
+    x_ticks_labels = ["[{:.0f}-{:.0f})".format(value, bins[idx+1]) for idx, value in enumerate(bins[:-1])]
+    x_ticks_labels[-1] = x_ticks_labels[-1][:-1] + "]"
+    plt.xticks(x_ticks, labels=x_ticks_labels, fontsize=4)
+    ax.tick_params(axis='x', which='minor', length=0)
+
+    # grid
+    minor_locator = AutoMinorLocator(2)
+    plt.gca().xaxis.set_minor_locator(minor_locator)
+    plt.grid(which='minor', color="white", lw=0.5)
+    plt.title(title)
+
+    plt.savefig(path + f"/{title}.png")
+    if show:
+        plt.show()
