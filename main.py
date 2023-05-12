@@ -77,39 +77,36 @@ if __name__ == '__main__':
         "ages": True,  # age or count - bool
         "type": None,  # Type of the changing parameter (just for naming) - str
         "show": False,  # Show plots in the IDE - bool
-        "bin_type": "scott"  # Algorithm for determining bins - custom/auto/scott/# of bins
+        "bin_type": "custom"  # Algorithm for determining bins - custom/auto/scott/# of bins
     }
 
     base_param_sock_count = {
         "SOCK_COUNT": 10,
-        "USAGE_PROBABILITY": 0.2,
-        "MAX_CYCLE": 50,
-        "BIN_WIDTH": 10
+        "USAGE_PROBABILITY": 0.22,
+        "MAX_CYCLE": 100,
     }
 
     base_param_prob = {
-        "SOCK_COUNT": 10,
-        "USAGE_PROBABILITY": 0.2,
-        "MAX_CYCLE": 50,
-        "BIN_WIDTH": 5
+        "SOCK_COUNT": 50,
+        "USAGE_PROBABILITY": 0.01,
+        "MAX_CYCLE": 100,
     }
 
     base_param_cycle = {
-        "SOCK_COUNT": 30,
-        "USAGE_PROBABILITY": 0.2,
-        "MAX_CYCLE": 10,
-        "BIN_WIDTH": 5
+        "SOCK_COUNT": 50,
+        "USAGE_PROBABILITY": 0.22,
+        "MAX_CYCLE": 1,
     }
 
     save_arg["type"] = "SOCK_COUNT"
-    param_sock_count = parameter_create("SOCK_COUNT", base_param_sock_count, 11, 4)
+    param_sock_count = parameter_create("SOCK_COUNT", base_param_sock_count, 46, 2)
     main(save=save_arg, parameters=param_sock_count, file_name="increased_sock_count", graph_path="graphs/sock_count/")
 
     save_arg["type"] = "USAGE_PROBABILITY"
-    param_prob = parameter_create("USAGE_PROBABILITY", base_param_prob, 10, 0.05)
+    param_prob = parameter_create("USAGE_PROBABILITY", base_param_prob, 100, 0.01)
     main(save=save_arg, parameters=param_prob, file_name="increased_usage_probability",
          graph_path="graphs/usage_probability/")
 
     save_arg["type"] = "MAX_CYCLE"
-    param_cycle = parameter_create("MAX_CYCLE", base_param_cycle, 10, 10)
+    param_cycle = parameter_create("MAX_CYCLE", base_param_cycle, 200, 1)
     main(save=save_arg, parameters=param_cycle, file_name="increased_cycle", graph_path="graphs/cycle/")
