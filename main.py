@@ -8,9 +8,11 @@ def main(parameters: dict = None, save: dict = None, file_name: str = "selecting
     MAX_RUN = len(parameters)
     if save is None:
         save = {
-            "is_save": True,
-            "ages": True,
-            "counts": False,
+            "is_save": True,  # Save to excel
+            "ages": True,  # age or count
+            "type": None,  # Type of the changing parameter
+            "show": False,  # Show plots in the IDE
+            "bin_type": "scott"  # Algorithm for determining bins
         }
 
     # File constants
@@ -30,7 +32,6 @@ def main(parameters: dict = None, save: dict = None, file_name: str = "selecting
         SOCK_COUNT = parameters[f"P{run + 1}"]["SOCK_COUNT"]
         USAGE_PROBABILITY = parameters[f"P{run + 1}"]["USAGE_PROBABILITY"]
         MAX_CYCLE = parameters[f"P{run + 1}"]["MAX_CYCLE"]
-        BIN_WIDTH = parameters[f"P{run + 1}"]["BIN_WIDTH"]
         # Get the age count for selecting pairs
         [sock_ages, age_count] = select_pairs(SOCK_COUNT, USAGE_PROBABILITY, MAX_CYCLE, run + 1)
 
@@ -40,7 +41,7 @@ def main(parameters: dict = None, save: dict = None, file_name: str = "selecting
                 worksheet.cell(row=count_old + 1, column=3, value=f"{save_arg['type']} - "
                                                                   f"{parameters[f'P{run + 1}'][save_arg['type']]}")
                 count_old += SOCK_COUNT + 2
-            elif save["counts"]:
+            else:
                 save_counts(worksheet, age_count, count_old + 1, 1, str(run + 1))
                 worksheet.cell(row=count_old + 1, column=3, value=f"{save_arg['type']} - "
                                                                   f"{parameters[f'P{run + 1}'][save_arg['type']]}")
@@ -49,13 +50,13 @@ def main(parameters: dict = None, save: dict = None, file_name: str = "selecting
         else:
             if save["ages"]:
                 print(sock_ages)
-            elif save["counts"]:
-                pass
+            else:
+                print(age_count)
 
         # Plot to matplotlib
-        title = str(save["type"]) + " " + f"{parameters[f'P{run + 1}'][save['type']]:.2f}"
-        bin_count = MAX_CYCLE // BIN_WIDTH
-        plot_histogram(data=list(sock_ages.values()), bin_count=bin_count, range_min=0, range_max=MAX_CYCLE,
+        bin_type = save["bin_type"]
+        title = str(save["type"]) + " " + f"{parameters[f'P{run + 1}'][save['type']]:.2f}_{bin_type}"
+        plot_histogram(data=list(sock_ages.values()), bin_type=bin_type, range_min=0, range_max=MAX_CYCLE,
                        title=title, path=graph_path, show=save_arg["show"])
 
     if save["is_save"]:
@@ -72,11 +73,11 @@ if __name__ == '__main__':
 
     # Parameters
     save_arg = {
-        "is_save": True,
-        "ages": True,
-        "counts": False,
-        "type": None,
-        "show": False
+        "is_save": True,  # Save to excel
+        "ages": True,  # age or count
+        "type": None,  # Type of the changing parameter
+        "show": False,  # Show plots in the IDE
+        "bin_type": "scott"  # Algorithm for determining bins
     }
 
     base_param_sock_count = {
