@@ -62,7 +62,7 @@ def bin_algorithm(data: list):
     bins = [data_min + (i * step) for i in range(bin_count)]
     bins = list(set(bins))
     bins.sort()
-    if bins[-1] != data_max:
+    if bins[-1] < data_max:
         bins[-1] = data_max
 
     return bins
