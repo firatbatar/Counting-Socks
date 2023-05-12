@@ -73,11 +73,11 @@ if __name__ == '__main__':
 
     # Parameters
     save_arg = {
-        "is_save": True,  # Save to excel
-        "ages": True,  # age or count
-        "type": None,  # Type of the changing parameter
-        "show": False,  # Show plots in the IDE
-        "bin_type": "scott"  # Algorithm for determining bins
+        "is_save": True,  # Save to excel - bool
+        "ages": True,  # age or count - bool
+        "type": None,  # Type of the changing parameter (just for naming) - str
+        "show": False,  # Show plots in the IDE - bool
+        "bin_type": "scott"  # Algorithm for determining bins - custom/auto/scott/# of bins
     }
 
     base_param_sock_count = {
