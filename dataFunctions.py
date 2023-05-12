@@ -54,7 +54,7 @@ def save_counts(ws, data: dict, row: int, column: int, title_num: str):
     ws.add_table(tab)
 
 
-def bin_algorithm(data: list):
+def determine_bin_bounds(data: list):
     from math import ceil, sqrt
     bin_count = ceil(sqrt(len(data)))
     data_min, data_max = min(data), max(data)
@@ -83,7 +83,7 @@ def plot_histogram(data: list, title: str = "Title", path: str = "graphs",
     fig, ax = plt.subplots()
 
     if bin_type == "custom":
-        bin_bounds = bin_algorithm(data)
+        bin_bounds = determine_bin_bounds(data)
     else:
         bin_bounds = bin_type
 
