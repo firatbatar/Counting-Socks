@@ -46,6 +46,9 @@ def parameter_create(rule: str, start: dict, size: int, step: float = 1):
         for i in range(1, size + 1):
             new_param = start.copy()
             new_param["USAGE_PROBABILITY"] += step * (i - 1)
+            if new_param["USAGE_PROBABILITY"] > 1:
+                new_param["USAGE_PROBABILITY"] = 1
+
             parameters[f"P{i}"] = new_param
 
     elif rule == "MAX_CYCLE":

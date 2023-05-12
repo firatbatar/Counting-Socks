@@ -89,9 +89,15 @@ def plot_histogram(data: list, title: str = "Title", path: str = "graphs",
 
     _, bins, patches = ax.hist(data, bins=bin_bounds,  range=(range_min, range_max), ec='black')
     # x ticks
-    x_ticks = [(bins[idx+1] + value)/2 for idx, value in enumerate(bins[:-1])]
-    x_ticks_labels = ["[{:.0f}-{:.0f})".format(value, bins[idx+1]) for idx, value in enumerate(bins[:-1])]
-    x_ticks_labels[-1] = x_ticks_labels[-1][:-1] + "]"
+
+    if len(bins) != 1:
+        x_ticks = [(bins[idx + 1] + value) / 2 for idx, value in enumerate(bins[:-1])]
+        x_ticks_labels = ["[{:.0f}-{:.0f})".format(value, bins[idx+1]) for idx, value in enumerate(bins[:-1])]
+        x_ticks_labels[-1] = x_ticks_labels[-1][:-1] + "]"
+    else:
+        plt.close()
+        return None
+
     if bin_type == "custom":
         plt.xticks(x_ticks, labels=x_ticks_labels, fontsize=8)
     else:
