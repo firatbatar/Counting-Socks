@@ -34,15 +34,20 @@ def save_ages(ws, data: dict, row: int, column: int, title_num: str):
 
 
 def determine_bin_bounds(data: list):
-    from math import ceil, sqrt
-    bin_count = ceil(sqrt(len(data)))
-    data_min, data_max = min(data), max(data)
-    step = ceil((data_max - data_min) / bin_count)
-    bins = [data_min + (i * step) for i in range(bin_count)]
-    bins = list(set(bins))
-    bins.sort()
-    if bins[-1] < data_max:
-        bins[-1] = data_max
+    bin_count = 6
+    data_min, data_max = min(data) - 0.5, max(data) + 0.5
+    step = (data_max - data_min) / bin_count
+    if step < 1:
+        step = 1
+    else:
+        dec = step - int(step)
+        step = int(step)
+        if dec <= 0.5:
+            step += 0.5
+        else:
+            step += 1
+
+    bins = [data_min + step * i for i in range(bin_count + 1)]
 
     return bins
 
@@ -74,11 +79,11 @@ def plot_histogram(data: list, title: str = "Title", path: str = "graphs",
         return None
 
     x_ticks = [(bins[idx + 1] + value) / 2 for idx, value in enumerate(bins[:-1])]
-    x_ticks_labels = ["[{:.0f}-{:.0f})".format(value, bins[idx+1]) for idx, value in enumerate(bins[:-1])]
+    x_ticks_labels = ["[{:.2f}-{:.2f})".format(value, bins[idx+1]) for idx, value in enumerate(bins[:-1])]
     x_ticks_labels[-1] = x_ticks_labels[-1][:-1] + "]"
 
     if bin_type == "custom":
-        plt.xticks(x_ticks, labels=x_ticks_labels, fontsize=8)
+        plt.xticks(x_ticks, labels=x_ticks_labels, fontsize=6)
     else:
         plt.xticks(x_ticks, labels=x_ticks_labels, fontsize=4)
 

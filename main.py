@@ -85,7 +85,7 @@ if __name__ == '__main__':
     base_param_cycle = {
         "SOCK_COUNT": 50,
         "USAGE_PROBABILITY": 0.22,
-        "MAX_CYCLE": 1,
+        "MAX_CYCLE": 10,
     }
 
     start = time()
