@@ -1,15 +1,13 @@
 def main(parameters: dict = None, save: dict = None, file_name: str = "selecting_pairs", graph_path: str = "graphs"):
     from openpyxl import Workbook
     from openpyxl.worksheet.table import Table, TableStyleInfo
-    from time import time
-    from dataFunctions import save_data, save_ages, save_counts, plot_histogram
+    from dataFunctions import save_data, save_ages, plot_histogram
     from utility import select_pairs
 
     MAX_RUN = len(parameters)
     if save is None:
         save = {
             "is_save": True,  # Save to excel
-            "ages": True,  # age or count
             "type": None,  # Type of the changing parameter
             "show": False,  # Show plots in the IDE
             "bin_type": "scott"  # Algorithm for determining bins
@@ -33,31 +31,22 @@ def main(parameters: dict = None, save: dict = None, file_name: str = "selecting
         USAGE_PROBABILITY = parameters[f"P{run + 1}"]["USAGE_PROBABILITY"]
         MAX_CYCLE = parameters[f"P{run + 1}"]["MAX_CYCLE"]
         # Get the age count for selecting pairs
-        [sock_ages, age_count] = select_pairs(SOCK_COUNT, USAGE_PROBABILITY, MAX_CYCLE, run + 1)
+        sock_ages = select_pairs(SOCK_COUNT, USAGE_PROBABILITY, MAX_CYCLE, run + 1, save["hide_messages"])
 
         if save["is_save"]:
-            if save["ages"]:
-                save_ages(worksheet, sock_ages, count_old + 1, 1, str(run + 1))
-                worksheet.cell(row=count_old + 1, column=3, value=f"{save_arg['type']} - "
-                                                                  f"{parameters[f'P{run + 1}'][save_arg['type']]}")
-                count_old += SOCK_COUNT + 2
-            else:
-                save_counts(worksheet, age_count, count_old + 1, 1, str(run + 1))
-                worksheet.cell(row=count_old + 1, column=3, value=f"{save_arg['type']} - "
-                                                                  f"{parameters[f'P{run + 1}'][save_arg['type']]}")
-                count_old += len(age_count) + 2
+            save_ages(worksheet, sock_ages, count_old + 1, 1, str(run + 1))
+            worksheet.cell(row=count_old + 1, column=3, value=f"{args['type']} - "
+                                                              f"{parameters[f'P{run + 1}'][args['type']]}")
+            count_old += SOCK_COUNT + 2
 
         else:
-            if save["ages"]:
-                print(sock_ages)
-            else:
-                print(age_count)
+            print(sock_ages)
 
         # Plot to matplotlib
         bin_type = save["bin_type"]
         title = str(save["type"]) + " " + f"{parameters[f'P{run + 1}'][save['type']]:.2f}_{bin_type}"
         plot_histogram(data=list(sock_ages.values()), bin_type=bin_type, range_min=0, range_max=MAX_CYCLE,
-                       title=title, path=graph_path, show=save_arg["show"])
+                       title=title, path=graph_path, show=args["show"])
 
     if save["is_save"]:
         # Save the files with the ending 'FILE_END'
@@ -68,16 +57,17 @@ def main(parameters: dict = None, save: dict = None, file_name: str = "selecting
 
 if __name__ == '__main__':
     import os
+    from time import time
     from utility import parameter_create
     os.system('cls')
 
     # Parameters
-    save_arg = {
+    args = {
         "is_save": True,  # Save to excel - bool
-        "ages": True,  # age or count - bool
         "type": None,  # Type of the changing parameter (just for naming) - str
         "show": False,  # Show plots in the IDE - bool
-        "bin_type": "custom"  # Algorithm for determining bins - custom/auto/scott/# of bins
+        "bin_type": "custom",  # Algorithm for determining bins - custom/auto/scott/# of bins
+        "hide_messages": True
     }
 
     base_param_sock_count = {
@@ -98,15 +88,21 @@ if __name__ == '__main__':
         "MAX_CYCLE": 1,
     }
 
-    save_arg["type"] = "SOCK_COUNT"
+    start = time()
+    args["type"] = "SOCK_COUNT"
     param_sock_count = parameter_create("SOCK_COUNT", base_param_sock_count, 46, 2)
-    main(save=save_arg, parameters=param_sock_count, file_name="increased_sock_count", graph_path="graphs/sock_count/")
+    main(save=args, parameters=param_sock_count, file_name="increased_sock_count", graph_path="graphs/sock_count/")
+    print(f"Time for the first simulation: {time() - start:.2f} seconds")
 
-    save_arg["type"] = "USAGE_PROBABILITY"
+    start = time()
+    args["type"] = "USAGE_PROBABILITY"
     param_prob = parameter_create("USAGE_PROBABILITY", base_param_prob, 100, 0.01)
-    main(save=save_arg, parameters=param_prob, file_name="increased_usage_probability",
+    main(save=args, parameters=param_prob, file_name="increased_usage_probability",
          graph_path="graphs/usage_probability/")
+    print(f"Time for the second simulation: {time() - start:.2f} seconds")
 
-    save_arg["type"] = "MAX_CYCLE"
+    start = time()
+    args["type"] = "MAX_CYCLE"
     param_cycle = parameter_create("MAX_CYCLE", base_param_cycle, 200, 1)
-    main(save=save_arg, parameters=param_cycle, file_name="increased_cycle", graph_path="graphs/cycle/")
+    main(save=args, parameters=param_cycle, file_name="increased_cycle", graph_path="graphs/cycle/")
+    print(f"Time for the third simulation: {time() - start:.2f} seconds")

@@ -15,17 +15,6 @@ def re_pair(socks: list):
     return pairs
 
 
-def count_values(dictionary: dict):
-    new_dict = dict()
-    for value in dictionary.values():
-        if value in new_dict:
-            new_dict[value] += 1
-        else:
-            new_dict[value] = 1
-
-    return new_dict
-
-
 def parameter_create(rule: str, start: dict, size: int, step: float = 1):
     parameters = dict()
     if rule == "constant":
@@ -61,39 +50,15 @@ def parameter_create(rule: str, start: dict, size: int, step: float = 1):
     return parameters
 
 
-def select_pairs(sock_count: int, usage_probability: float, max_cycle: int, run: int):
-    from time import time
+def select_pairs(sock_count: int, usage_probability: float, max_cycle: int, run: int, hide_messages: bool = False):
     from washFunctions import wash_pairs
-
-    start_time = time()
 
     # Get the age of the socks
     sock_ages = wash_pairs(sock_count, usage_probability, max_cycle)
 
-    # Convert it to number of socks with a certain age
-    age_count = count_values(sock_ages)
+    if not hide_messages:
+        print(f"The simulation of 'selecting pair' #{run} was successfully executed!"
+              f"\nIt simulated {sock_count} sock(s) with a probability of usage"
+              f" {usage_probability * 100}% per pair for {max_cycle} cycle(s).\n")
 
-    print(f"The simulation of 'selecting pair' #{run} was successfully executed in {time() - start_time:.3f} seconds!"
-          f"\nIt simulated {sock_count} sock(s) with a probability of usage"
-          f" {usage_probability * 100}% per pair for {max_cycle} cycle(s).")
-
-    return [sock_ages, age_count]
-
-
-def select_singles(sock_count: int, usage_probability: float, max_cycle: int, run: int):
-    from time import time
-    from washFunctions import wash_singles
-
-    start_time = time()
-
-    # Get the age of the socks
-    sock_ages = wash_singles(sock_count, usage_probability, max_cycle)
-
-    # Convert it to number of socks with a certain age
-    age_count = count_values(sock_ages)
-
-    print(f"The simulation of 'selecting singles' #{run} was successfully executed in {time() - start_time:.3f} seconds!"
-          f"\nIt simulated {sock_count} sock(s) with a probability of usage"
-          f" {usage_probability * 100}% per pair for {max_cycle} cycle(s).")
-
-    return [sock_ages, age_count]
+    return sock_ages
