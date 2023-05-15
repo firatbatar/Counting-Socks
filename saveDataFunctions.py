@@ -53,7 +53,7 @@ def determine_bin_bounds(data: list):
 
 
 def plot_histogram(data: list, title: str = "Title", path: str = "graphs",
-                   range_min: int = None, range_max: int = None, bin_type="custom", show: bool = False):
+                   range_min: int = None, range_max: int = None, show: bool = False):
     from matplotlib import pyplot as plt
     from matplotlib.ticker import AutoMinorLocator
     import numpy as np
@@ -66,13 +66,8 @@ def plot_histogram(data: list, title: str = "Title", path: str = "graphs",
     # plot:
     fig, ax = plt.subplots()
 
-    if bin_type == "custom":
-        bin_bounds = determine_bin_bounds(data)
-    else:
-        bin_bounds = bin_type
-
+    bin_bounds = determine_bin_bounds(data)
     _, bins, patches = ax.hist(data, bins=bin_bounds,  range=(range_min, range_max), ec='black')
-    # x ticks
 
     if len(bins) == 1:
         plt.close()
@@ -82,10 +77,7 @@ def plot_histogram(data: list, title: str = "Title", path: str = "graphs",
     x_ticks_labels = ["[{:.2f}-{:.2f})".format(value, bins[idx+1]) for idx, value in enumerate(bins[:-1])]
     x_ticks_labels[-1] = x_ticks_labels[-1][:-1] + "]"
 
-    if bin_type == "custom":
-        plt.xticks(x_ticks, labels=x_ticks_labels, fontsize=6)
-    else:
-        plt.xticks(x_ticks, labels=x_ticks_labels, fontsize=4)
+    plt.xticks(x_ticks, labels=x_ticks_labels, fontsize=6)
 
     ax.tick_params(axis='x', which='minor', length=0)
 

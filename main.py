@@ -9,8 +9,7 @@ def main(parameters: dict = None, save: dict = None, file_name: str = "selecting
         save = {
             "is_save": True,  # Save to excel
             "type": None,  # Type of the changing parameter
-            "show": False,  # Show plots in the IDE
-            "bin_type": "scott"  # Algorithm for determining bins
+            "show": False  # Show plots in the IDE
         }
 
     # File constants
@@ -43,9 +42,8 @@ def main(parameters: dict = None, save: dict = None, file_name: str = "selecting
             print(sock_ages)
 
         # Plot to matplotlib
-        bin_type = save["bin_type"]
-        title = str(save["type"]) + " " + f"{parameters[f'P{run + 1}'][save['type']]:.2f}_{bin_type}"
-        plot_histogram(data=list(sock_ages.values()), bin_type=bin_type, range_min=0, range_max=MAX_CYCLE,
+        title = str(save["type"]) + " " + f"{parameters[f'P{run + 1}'][save['type']]:.2f}"
+        plot_histogram(data=list(sock_ages.values()), range_min=0, range_max=MAX_CYCLE,
                        title=title, path=graph_path, show=args["show"])
 
     if save["is_save"]:
@@ -66,7 +64,6 @@ if __name__ == '__main__':
         "is_save": True,  # Save to excel - bool
         "type": None,  # Type of the changing parameter (just for naming) - str
         "show": False,  # Show plots in the IDE - bool
-        "bin_type": "custom",  # Algorithm for determining bins - custom/auto/scott/# of bins
         "hide_messages": True
     }
 
