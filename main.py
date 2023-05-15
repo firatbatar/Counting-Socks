@@ -1,7 +1,7 @@
 def main(parameters: dict = None, save: dict = None, file_name: str = "selecting_pairs", graph_path: str = "graphs"):
     from openpyxl import Workbook
     from openpyxl.worksheet.table import Table, TableStyleInfo
-    from dataFunctions import save_data, save_ages, plot_histogram
+    from saveDataFunctions import save_data, save_ages, plot_histogram
     from utility import select_pairs
 
     MAX_RUN = len(parameters)
