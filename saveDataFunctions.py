@@ -87,3 +87,5 @@ def plot_histogram(data: list, title: str = "Title", path: str = "graphs",
     if show:
         plt.show()
     plt.close()
+
+    return bin_bounds
