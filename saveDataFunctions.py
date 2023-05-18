@@ -66,7 +66,7 @@ def plot_histogram(data: list, title: str = "Title", path: str = "graphs",
     # plot:
     fig, ax = plt.subplots()
 
-    bin_bounds = determine_bin_bounds(data) if custom_bins is not None else custom_bins
+    bin_bounds = determine_bin_bounds(data) if custom_bins is None else custom_bins
     _, bins, patches = ax.hist(data, bins=bin_bounds,  range=(range_min, range_max), ec='black')
 
     if len(bins) == 1:
