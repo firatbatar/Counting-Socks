@@ -53,7 +53,7 @@ def determine_bin_bounds(data: list):
 
 
 def plot_histogram(data: list, title: str = "Title", path: str = "graphs",
-                   range_min: int = None, range_max: int = None, show: bool = False):
+                   range_min: int = None, range_max: int = None, show: bool = False, custom_bins=None):
     from matplotlib import pyplot as plt
     from matplotlib.ticker import AutoMinorLocator
     import numpy as np
@@ -66,7 +66,7 @@ def plot_histogram(data: list, title: str = "Title", path: str = "graphs",
     # plot:
     fig, ax = plt.subplots()
 
-    bin_bounds = determine_bin_bounds(data)
+    bin_bounds = determine_bin_bounds(data) if custom_bins is not None else custom_bins
     _, bins, patches = ax.hist(data, bins=bin_bounds,  range=(range_min, range_max), ec='black')
 
     if len(bins) == 1:

@@ -72,12 +72,12 @@ def main(parameters: dict = None, args: dict = None, file_name: str = "selecting
         if args["plot_expected"][0]:
             # Plot the expected normal distribution
             plot_histogram(data=normal_expected, range_min=0, range_max=MAX_CYCLE,
-                           title=title + "_normal_expected", path=graph_path, show=args["show"])
+                           title=title + "_normal_expected", path=graph_path, show=args["show"], custom_bins=run[3])
 
         uniform_expected = uniform_dist_expected(observed, run[3])  # Get the expected normal distribution
         if args["plot_expected"][1]:
             plot_histogram(data=uniform_expected, range_min=0, range_max=MAX_CYCLE,
-                           title=title + "_uniform_expected", path=graph_path, show=args["show"])
+                           title=title + "_uniform_expected", path=graph_path, show=args["show"], custom_bins=run[3])
 
 
 if __name__ == '__main__':
@@ -88,7 +88,7 @@ if __name__ == '__main__':
 
     # Parameters
     save_args = {
-        "plot_expected": [False, False],  # Plot the expected distribution - [NORMAL, UNIFORM] (bool)
+        "plot_expected": [False, True],  # Plot the expected distribution - [NORMAL, UNIFORM] (bool)
         "type": None,  # Type of the changing parameter (just for naming) - str
         "show": False,  # Show plots in the IDE - bool
         "hide_messages": True
