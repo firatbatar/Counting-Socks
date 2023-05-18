@@ -54,7 +54,7 @@ def main(parameters: dict = None, args: dict = None, file_name: str = "selecting
 
     if args is None:
         args = {
-            "plot_expected": [False, False],  # Plot the expected distribution - [NORMAL, UNIFORM] (bool)
+            "plot_expected": [True, False],  # Plot the expected distribution - [NORMAL, UNIFORM] (bool)
             "type": None,  # Type of the changing parameter
             "show": False,  # Show plots in the IDE
             "hide_messages": False,
@@ -88,7 +88,7 @@ if __name__ == '__main__':
 
     # Parameters
     save_args = {
-        "plot_expected": [False, True],  # Plot the expected distribution - [NORMAL, UNIFORM] (bool)
+        "plot_expected": [True, False],  # Plot the expected distribution - [NORMAL, UNIFORM] (bool)
         "type": None,  # Type of the changing parameter (just for naming) - str
         "show": False,  # Show plots in the IDE - bool
         "hide_messages": True
@@ -116,17 +116,17 @@ if __name__ == '__main__':
     save_args["type"] = "SOCK_COUNT"
     param_sock_count = parameter_create("SOCK_COUNT", base_param_sock_count, 46, 2)  # 46
     main(args=save_args, parameters=param_sock_count, file_name="increased_sock_count", graph_path="graphs/sock_count/")
-    print(f"Time for the first simulation: {time() - start:.2f} seconds")
+    print(f"Time for the sock count simulation: {time() - start:.2f} seconds")
 
     start = time()
     save_args["type"] = "USAGE_PROBABILITY"
     param_prob = parameter_create("USAGE_PROBABILITY", base_param_prob, 100, 0.01)
     main(args=save_args, parameters=param_prob, file_name="increased_usage_probability",
          graph_path="graphs/usage_probability/")
-    print(f"Time for the second simulation: {time() - start:.2f} seconds")
+    print(f"Time for the usage probability simulation: {time() - start:.2f} seconds")
     
     start = time()
     save_args["type"] = "MAX_CYCLE"
     param_cycle = parameter_create("MAX_CYCLE", base_param_cycle, 200, 1)
     main(args=save_args, parameters=param_cycle, file_name="increased_cycle", graph_path="graphs/cycle/")
-    print(f"Time for the third simulation: {time() - start:.2f} seconds")
+    print(f"Time for the max cycle simulation: {time() - start:.2f} seconds")

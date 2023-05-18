@@ -34,10 +34,16 @@ def uniform_dist_expected(observed: list, bins: list):
 
     expected = list()
     total = len(observed)
-    p = max(observed) - min(observed)
+    total_width = max(observed) - min(observed)
+    if total_width == 0:
+        total_width = 1
     for i in range(1, len(bins)):
+        if bins[i] < min(observed) or bins[i - 1] > max(observed):
+            continue
+
         width = bins[i] - bins[i - 1]
         v = (bins[i] + bins[i - 1]) / 2
-        expected += [v for _ in range(ceil(total * width / p))]
+        p = width / total_width
+        expected += [v for _ in range(ceil(total * p))]
 
     return expected
