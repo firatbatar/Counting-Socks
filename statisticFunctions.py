@@ -26,24 +26,41 @@ def normal_dist_expected(observed: list, bins: list):
         v = (bins[i + 1] + bins[i]) / 2
         expected += [v for _ in range(ceil(total * p))]
 
+    expected.sort()
+    while len(observed) > len(expected):
+        expected.append(mean)
+
+    i = j = -1
+    while len(observed) < len(expected):
+        j *= -1
+        expected.pop(i + j)
+
     return expected
 
 
 def uniform_dist_expected(observed: list, bins: list):
+    import statistics
     from math import ceil
 
     expected = list()
     total = len(observed)
-    total_width = max(observed) - min(observed)
-    if total_width == 0:
-        total_width = 1
-    for i in range(1, len(bins)):
-        if bins[i] < min(observed) or bins[i - 1] > max(observed):
-            continue
+    if max(observed) - min(observed) == 0:
+        return observed.copy()
 
-        width = bins[i] - bins[i - 1]
+    interval_count = len(bins) - 1
+    count = total / interval_count
+    for i in range(1, len(bins)):
         v = (bins[i] + bins[i - 1]) / 2
-        p = width / total_width
-        expected += [v for _ in range(ceil(total * p))]
+        expected += [v for _ in range(round(count))]
+
+    expected.sort()
+    mean = statistics.mean(observed)
+    while len(observed) > len(expected):
+        expected.append(mean)
+
+    i = j = -1
+    while len(observed) < len(expected):
+        j *= -1
+        expected.pop(i + j)
 
     return expected
