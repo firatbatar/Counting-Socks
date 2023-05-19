@@ -32,8 +32,8 @@ def run_simulation(parameters: dict, args: dict, file_name: str, graph_path: str
         count_old += SOCK_COUNT + 2
 
         # Plot to matplotlib
-        title = f"{parameters[f'P{run + 1}']['SOCK_COUNT']:.2f} Socks\n" \
-                f"{parameters[f'P{run + 1}']['MAX_CYCLE']:.2f} Cycles\n" \
+        title = f"{parameters[f'P{run + 1}']['SOCK_COUNT']} Socks\n" \
+                f"{parameters[f'P{run + 1}']['MAX_CYCLE']} Cycles\n" \
                 f"{parameters[f'P{run + 1}']['USAGE_PROBABILITY']:.2f} Prob."
 
         observed = list(sock_ages.values())
@@ -76,12 +76,11 @@ def main(parameters: dict = None, args: dict = None, file_name: str = "selecting
         chi_uniform = chi_square_test(observed_freq, uniform_freq)
 
         print(
-            f"{title}\n"
+            f"\n{title}\n"
             f"Normal Distribution: "
             f"statistic: {chi_normal[0]}, p: {chi_normal[1]}\n"
             f"Uniform Distribution: "
             f"statistic: {chi_uniform[0]}, p: {chi_uniform[1]}"
-            f"\n"
         )
 
 
@@ -117,20 +116,23 @@ if __name__ == '__main__':
     }
 
     start = time()
+    print("Increasing SOCK COUNT")
     save_args["type"] = "SOCK_COUNT"
     param_sock_count = parameter_create("SOCK_COUNT", base_param_sock_count, 6, 20)
     main(args=save_args, parameters=param_sock_count, file_name="increased_sock_count", graph_path="graphs/sock_count/")
-    print(f"Time for the sock count simulation: {time() - start:.2f} seconds")
+    print(f"Time for the sock count simulation: {time() - start:.2f} seconds\n\n")
 
     start = time()
+    print("Increasing USAGE_PROBABILITY")
     save_args["type"] = "USAGE_PROBABILITY"
     param_prob = parameter_create("USAGE_PROBABILITY", base_param_prob, 6, 0.2)
     main(args=save_args, parameters=param_prob, file_name="increased_usage_probability",
          graph_path="graphs/usage_probability/")
-    print(f"Time for the usage probability simulation: {time() - start:.2f} seconds")
+    print(f"Time for the usage probability simulation: {time() - start:.2f} seconds\n\n")
     
     start = time()
+    print("Increasing MAX_CYCLE")
     save_args["type"] = "MAX_CYCLE"
     param_cycle = parameter_create("MAX_CYCLE", base_param_cycle, 6, 40)
     main(args=save_args, parameters=param_cycle, file_name="increased_cycle", graph_path="graphs/cycle/")
-    print(f"Time for the max cycle simulation: {time() - start:.2f} seconds")
+    print(f"Time for the max cycle simulation: {time() - start:.2f} seconds\n\n")
