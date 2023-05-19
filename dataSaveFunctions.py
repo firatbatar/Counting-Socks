@@ -118,7 +118,8 @@ def save_results_to_doc(runs: list, heading: str, path: str):
     document.add_heading(heading, 0)
 
     for run in runs:
-        document.add_paragraph(run["parameters"])
+        p = document.add_paragraph()
+        p.add_run(run["parameters"]).bold = True
         document.add_paragraph(run["chi_normal"], style='List Bullet')
         document.add_paragraph(run["chi_uniform"], style='List Bullet')
 
