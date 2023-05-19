@@ -1,7 +1,7 @@
 def run_simulation(parameters: dict, args: dict, file_name: str, graph_path: str):
     from openpyxl import Workbook
     from openpyxl.worksheet.table import Table, TableStyleInfo
-    from saveDataFunctions import save_data, save_ages, plot_histogram
+    from dataSaveFunctions import save_data, save_ages, plot_histogram
     from utility import select_pairs
 
     total_data = dict()
@@ -53,7 +53,7 @@ def run_simulation(parameters: dict, args: dict, file_name: str, graph_path: str
 
 def main(parameters: dict = None, args: dict = None, file_name: str = "selecting_pairs", graph_path: str = "graphs"):
     from utility import count_interval_freq
-    from saveDataFunctions import plot_histogram
+    from dataSaveFunctions import plot_histogram
     from statisticFunctions import chi_square_test
 
     if args is None:
