@@ -4,8 +4,6 @@ def run_simulation(parameters: dict, args: dict, file_name: str, graph_path: str
     from saveDataFunctions import save_data, save_ages, plot_histogram
     from utility import select_pairs
 
-    total_data = []
-
     MAX_RUN = len(parameters)
 
     # File constants
@@ -32,52 +30,32 @@ def run_simulation(parameters: dict, args: dict, file_name: str, graph_path: str
         count_old += SOCK_COUNT + 2
 
         # Plot to matplotlib
-        title = str(args["type"]) + " " + f"{parameters[f'P{run + 1}'][args['type']]:.2f}"
-        bins = plot_histogram(data=list(sock_ages.values()), range_min=0, range_max=MAX_CYCLE,
-                              title=title, path=graph_path, show=args["show"])
+        title = f"{parameters[f'P{run + 1}']['SOCK_COUNT']:.2f} Socks\n" \
+                f"{parameters[f'P{run + 1}']['MAX_CYCLE']:.2f} Cycles\n" \
+                f"{parameters[f'P{run + 1}']['USAGE_PROBABILITY']:.2f} Prob."
 
-        temp = list(sock_ages.values())
-        temp.sort()
-        total_data.append([MAX_CYCLE, title, temp, bins])
+        data = list(sock_ages.values())
+        data.sort()
+        plot_histogram(data=list(sock_ages.values()), range_min=0, range_max=MAX_CYCLE,
+                       title=title, path=graph_path, show=args["show"])
 
         # Save the files with the ending 'FILE_END'
         workbook.save(FILE_PATH + file_name + FILE_END)
 
         # print(f"The data of 'selecting pair' was saved to '{FILE_PATH + file_name + FILE_END}'.\n\n")
 
-    return total_data
-
 
 def main(parameters: dict = None, args: dict = None, file_name: str = "selecting_pairs", graph_path: str = "graphs"):
-    from statisticFunctions import normal_dist_expected, uniform_dist_expected
     from saveDataFunctions import plot_histogram
 
     if args is None:
         args = {
-            "plot_expected": [True, False],  # Plot the expected distribution - [NORMAL, UNIFORM] (bool)
             "type": None,  # Type of the changing parameter
             "show": False,  # Show plots in the IDE
             "hide_messages": False,
         }
 
-    # Run the simulation to get the observed distribution
-    total_data = run_simulation(parameters, args, file_name, graph_path)
-
-    for run in total_data:
-        MAX_CYCLE = run[0]
-        title = run[1]
-        observed = run[2]
-
-        normal_expected = normal_dist_expected(observed, run[3])  # Get the expected normal distribution
-        if args["plot_expected"][0]:
-            # Plot the expected normal distribution
-            plot_histogram(data=normal_expected, range_min=0, range_max=MAX_CYCLE,
-                           title=title + "_normal_expected", path=graph_path, show=args["show"], custom_bins=run[3])
-
-        uniform_expected = uniform_dist_expected(observed, run[3])  # Get the expected normal distribution
-        if args["plot_expected"][1]:
-            plot_histogram(data=uniform_expected, range_min=0, range_max=MAX_CYCLE,
-                           title=title + "_uniform_expected", path=graph_path, show=args["show"], custom_bins=run[3])
+    run_simulation(parameters, args, file_name, graph_path)
 
 
 if __name__ == '__main__':
@@ -88,7 +66,6 @@ if __name__ == '__main__':
 
     # Parameters
     save_args = {
-        "plot_expected": [True, False],  # Plot the expected distribution - [NORMAL, UNIFORM] (bool)
         "type": None,  # Type of the changing parameter (just for naming) - str
         "show": False,  # Show plots in the IDE - bool
         "hide_messages": True
@@ -102,7 +79,7 @@ if __name__ == '__main__':
 
     base_param_prob = {
         "SOCK_COUNT": 50,
-        "USAGE_PROBABILITY": 0.01,
+        "USAGE_PROBABILITY": 0.00,
         "MAX_CYCLE": 100,
     }
 
@@ -114,19 +91,19 @@ if __name__ == '__main__':
 
     start = time()
     save_args["type"] = "SOCK_COUNT"
-    param_sock_count = parameter_create("SOCK_COUNT", base_param_sock_count, 46, 2)  # 46
+    param_sock_count = parameter_create("SOCK_COUNT", base_param_sock_count, 6, 20)
     main(args=save_args, parameters=param_sock_count, file_name="increased_sock_count", graph_path="graphs/sock_count/")
     print(f"Time for the sock count simulation: {time() - start:.2f} seconds")
 
     start = time()
     save_args["type"] = "USAGE_PROBABILITY"
-    param_prob = parameter_create("USAGE_PROBABILITY", base_param_prob, 100, 0.01)
+    param_prob = parameter_create("USAGE_PROBABILITY", base_param_prob, 6, 0.2)
     main(args=save_args, parameters=param_prob, file_name="increased_usage_probability",
          graph_path="graphs/usage_probability/")
     print(f"Time for the usage probability simulation: {time() - start:.2f} seconds")
     
     start = time()
     save_args["type"] = "MAX_CYCLE"
-    param_cycle = parameter_create("MAX_CYCLE", base_param_cycle, 200, 1)
+    param_cycle = parameter_create("MAX_CYCLE", base_param_cycle, 6, 40)
     main(args=save_args, parameters=param_cycle, file_name="increased_cycle", graph_path="graphs/cycle/")
     print(f"Time for the max cycle simulation: {time() - start:.2f} seconds")

@@ -54,7 +54,9 @@ def determine_bin_bounds(data: list):
 
 def plot_histogram(data: list, title: str = "Title", path: str = "graphs",
                    range_min: int = None, range_max: int = None, show: bool = False, custom_bins=None):
+    from statisticFunctions import normal_dist_expected, uniform_dist_expected
     from matplotlib import pyplot as plt
+    from matplotlib.text import Text
     from matplotlib.ticker import AutoMinorLocator
     import numpy as np
 
@@ -64,10 +66,17 @@ def plot_histogram(data: list, title: str = "Title", path: str = "graphs",
         range_max = max(data)
 
     # plot:
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(3, 1, figsize=(15, 20))
 
     bin_bounds = determine_bin_bounds(data) if custom_bins is None else custom_bins
-    _, bins, patches = ax.hist(data, bins=bin_bounds,  range=(range_min, range_max), ec='black')
+
+    _, bins, patches = ax[0].hist(data, bins=bin_bounds,  range=(range_min, range_max), ec='black')
+
+    normal_expected = normal_dist_expected(data, bins)  # Get the expected normal distribution
+    uniform_expected = uniform_dist_expected(data, bins)  # Get the expected normal distribution
+
+    _, __, __ = ax[1].hist(normal_expected, bins=bins,  range=(range_min, range_max), ec='black')
+    _, __, __ = ax[2].hist(uniform_expected, bins=bins,  range=(range_min, range_max), ec='black')
 
     if len(bins) == 1:
         plt.close()
@@ -77,13 +86,22 @@ def plot_histogram(data: list, title: str = "Title", path: str = "graphs",
     x_ticks_labels = ["[{:.2f}-{:.2f})".format(value, bins[idx+1]) for idx, value in enumerate(bins[:-1])]
     x_ticks_labels[-1] = x_ticks_labels[-1][:-1] + "]"
 
-    plt.xticks(x_ticks, labels=x_ticks_labels, fontsize=6)
+    plt.setp(ax, xticks=x_ticks, xticklabels=x_ticks_labels)
+    ax[0].tick_params(axis='x', which='minor', length=0)
+    ax[1].tick_params(axis='x', which='minor', length=0)
+    ax[2].tick_params(axis='x', which='minor', length=0)
 
-    ax.tick_params(axis='x', which='minor', length=0)
+    subplot_fontdict = {'fontsize': 19}
+    ax[0].set_title('Observed', fontdict=subplot_fontdict)
+    ax[1].set_title('Expected Normal Distribution', fontdict=subplot_fontdict)
+    ax[2].set_title('Expected Uniform Distribution', fontdict=subplot_fontdict)
 
-    plt.title(title)
+    filename = title.replace("\n", " ")
+    plt_title = title.replace("\n", ", ")
+    fig.suptitle(plt_title, size=26, y=0.95)
+    plt.savefig(path + f"{filename}.png", bbox_inches="tight")
 
-    plt.savefig(path + f"/{title}.png")
+    plt.cla()
     if show:
         plt.show()
     plt.close()
