@@ -4,6 +4,8 @@ def run_simulation(parameters: dict, args: dict, file_name: str, graph_path: str
     from saveDataFunctions import save_data, save_ages, plot_histogram
     from utility import select_pairs
 
+    total_data = dict()
+
     MAX_RUN = len(parameters)
 
     # File constants
@@ -34,19 +36,25 @@ def run_simulation(parameters: dict, args: dict, file_name: str, graph_path: str
                 f"{parameters[f'P{run + 1}']['MAX_CYCLE']:.2f} Cycles\n" \
                 f"{parameters[f'P{run + 1}']['USAGE_PROBABILITY']:.2f} Prob."
 
-        data = list(sock_ages.values())
-        data.sort()
-        plot_histogram(data=list(sock_ages.values()), range_min=0, range_max=MAX_CYCLE,
-                       title=title, path=graph_path, show=args["show"])
+        observed = list(sock_ages.values())
+        observed.sort()
+        data = plot_histogram(observed=observed, range_min=0, range_max=MAX_CYCLE,
+                              title=title, path=graph_path, show=args["show"])
+
+        total_data[str(run)] = data
 
         # Save the files with the ending 'FILE_END'
         workbook.save(FILE_PATH + file_name + FILE_END)
 
         # print(f"The data of 'selecting pair' was saved to '{FILE_PATH + file_name + FILE_END}'.\n\n")
 
+    return total_data
+
 
 def main(parameters: dict = None, args: dict = None, file_name: str = "selecting_pairs", graph_path: str = "graphs"):
+    from utility import count_interval_freq
     from saveDataFunctions import plot_histogram
+    from statisticFunctions import chi_square_test
 
     if args is None:
         args = {
@@ -55,7 +63,26 @@ def main(parameters: dict = None, args: dict = None, file_name: str = "selecting
             "hide_messages": False,
         }
 
-    run_simulation(parameters, args, file_name, graph_path)
+    total_data = run_simulation(parameters, args, file_name, graph_path)
+
+    for run in total_data.keys():
+        [bins, observed, normal_exp, uniform_exp, title] = total_data[run]
+
+        observed_freq = count_interval_freq(observed, bins)
+        normal_freq = count_interval_freq(normal_exp, bins)
+        uniform_freq = count_interval_freq(uniform_exp, bins)
+
+        chi_normal = chi_square_test(observed_freq, normal_freq)
+        chi_uniform = chi_square_test(observed_freq, uniform_freq)
+
+        print(
+            f"{title}\n"
+            f"Normal Distribution: "
+            f"statistic: {chi_normal[0]}, p: {chi_normal[1]}\n"
+            f"Uniform Distribution: "
+            f"statistic: {chi_uniform[0]}, p: {chi_uniform[1]}"
+            f"\n"
+        )
 
 
 if __name__ == '__main__':

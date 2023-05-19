@@ -64,3 +64,13 @@ def uniform_dist_expected(observed: list, bins: list):
         expected.pop(i + j)
 
     return expected
+
+
+def chi_square_test(observed_freq: list, expected_freq: list):
+    from scipy.stats import chisquare
+    from numpy import seterr
+    seterr(divide="ignore", invalid="ignore")
+
+    chi = chisquare(f_obs=observed_freq, f_exp=expected_freq)
+
+    return chi

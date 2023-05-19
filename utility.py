@@ -1,3 +1,25 @@
+def count_interval_freq(data: list, intervals: list):
+    data.sort()
+
+    n, m = len(data), len(intervals)
+    count = [0] * (m - 1)
+
+    low = 0
+    ptr = 0
+
+    while ptr < n:
+        i = data[ptr]
+        if intervals[low] <= i <= intervals[low + 1]:
+            count[low] += 1
+            ptr += 1
+        elif i >= intervals[low]:
+            if low == len(intervals) - 1:
+                break
+            low += 1
+
+    return count
+
+
 def re_pair(socks: list):
     from random import randint
 

@@ -52,7 +52,7 @@ def determine_bin_bounds(data: list):
     return bins
 
 
-def plot_histogram(data: list, title: str = "Title", path: str = "graphs",
+def plot_histogram(observed: list, title: str = "Title", path: str = "graphs",
                    range_min: int = None, range_max: int = None, show: bool = False, custom_bins=None):
     from statisticFunctions import normal_dist_expected, uniform_dist_expected
     from matplotlib import pyplot as plt
@@ -61,19 +61,19 @@ def plot_histogram(data: list, title: str = "Title", path: str = "graphs",
     import numpy as np
 
     if range_min is None:
-        range_min = min(data)
+        range_min = min(observed)
     if range_max is None:
-        range_max = max(data)
+        range_max = max(observed)
 
     # plot:
     fig, ax = plt.subplots(3, 1, figsize=(15, 20))
 
-    bin_bounds = determine_bin_bounds(data) if custom_bins is None else custom_bins
+    bin_bounds = determine_bin_bounds(observed) if custom_bins is None else custom_bins
 
-    _, bins, patches = ax[0].hist(data, bins=bin_bounds,  range=(range_min, range_max), ec='black')
+    _, bins, patches = ax[0].hist(observed, bins=bin_bounds, range=(range_min, range_max), ec='black')
 
-    normal_expected = normal_dist_expected(data, bins)  # Get the expected normal distribution
-    uniform_expected = uniform_dist_expected(data, bins)  # Get the expected normal distribution
+    normal_expected = normal_dist_expected(observed, bins)  # Get the expected normal distribution
+    uniform_expected = uniform_dist_expected(observed, bins)  # Get the expected normal distribution
 
     _, __, __ = ax[1].hist(normal_expected, bins=bins,  range=(range_min, range_max), ec='black')
     _, __, __ = ax[2].hist(uniform_expected, bins=bins,  range=(range_min, range_max), ec='black')
@@ -106,4 +106,4 @@ def plot_histogram(data: list, title: str = "Title", path: str = "graphs",
         plt.show()
     plt.close()
 
-    return bin_bounds
+    return [bins, observed, normal_expected, uniform_expected, plt_title]
