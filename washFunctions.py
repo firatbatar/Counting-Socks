@@ -23,27 +23,3 @@ def wash_pairs(sock_count: int, probability_of_usage: float, max_cycle: int):
 
     return sock_ages
 
-
-def wash_singles(sock_count: int, probability_of_usage: float, max_cycle: int):
-    from random import random, randint
-
-    sock_ages = dict.fromkeys(list(range(1, sock_count + 1)), 0)
-
-    for cycle in range(max_cycle):
-        selection = []
-        for sock_idx in range(1, sock_count+1):
-            # Check if the sock will be used
-            prob = random()
-            if prob < probability_of_usage:
-                selection.append(sock_idx)  # Add selected to "washing machine"
-
-                # "Washed" socks get older
-                sock_ages[sock_idx] += 1
-        while len(selection) % 2 != 0:
-            selected = randint(1, sock_count)
-            if selected in selection:
-                continue
-            prob = random()
-            if prob < probability_of_usage:
-                selection.append(selected)  # Add selected to "washing machine"
-    return sock_ages

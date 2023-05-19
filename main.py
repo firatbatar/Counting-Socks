@@ -1,68 +1,22 @@
-def select_pairs(sock_count: int, usage_probability: float, max_cycle: int, run: int):
-    from time import time
-    from washFunctions import wash_pairs
-    from utility import count_values
-
-    start_time = time()
-
-    # Get the age of the socks
-    sock_ages = wash_pairs(sock_count, usage_probability, max_cycle)
-
-    # Convert it to number of socks with a certain age
-    age_count = count_values(sock_ages)
-
-    print(f"The simulation of 'selecting pair'#{run} was successfully executed in {time() - start_time:.3f} seconds!"
-          f"\nIt simulated {sock_count} sock(s) with a probability of usage"
-          f" {usage_probability * 100}% per pair for {max_cycle} cycle(s).")
-
-    return [sock_ages, age_count]
-
-
-def select_singles(sock_count: int, usage_probability: float, max_cycle: int, run: int):
-    from time import time
-    from washFunctions import wash_singles
-    from utility import count_values
-
-    start_time = time()
-
-    # Get the age of the socks
-    sock_ages = wash_singles(sock_count, usage_probability, max_cycle)
-
-    # Convert it to number of socks with a certain age
-    age_count = count_values(sock_ages)
-
-    print(f"The simulation of 'selecting singles'#{run} was successfully executed in {time() - start_time:.3f} seconds!"
-          f"\nIt simulated {sock_count} sock(s) with a probability of usage"
-          f" {usage_probability * 100}% per pair for {max_cycle} cycle(s).")
-
-    return [sock_ages, age_count]
-
-
-def main(parameters: dict = None, save: dict = None, file_name: str = "selecting_pairs"):
-    MAX_RUN = len(parameters)
-    if save is None:
-        save = {
-            "is_save": True,
-            "ages": True,
-            "counts": False,
-        }
-
+def run_simulation(parameters: dict, args: dict, file_name: str, graph_path: str):
     from openpyxl import Workbook
     from openpyxl.worksheet.table import Table, TableStyleInfo
-    from time import time
-    from dataFunctions import save_data, save_ages, save_counts
+    from saveDataFunctions import save_data, save_ages, plot_histogram
+    from utility import select_pairs
+
+    total_data = dict()
+
+    MAX_RUN = len(parameters)
 
     # File constants
     FILE_PATH = "data/"
     FILE_END = "-raw_data.xlsx"
 
-    workbook = worksheet = None
     count_old = 0
-    if save["is_save"]:
-        # Workbook for raw data
-        workbook = Workbook()
-        worksheet = workbook.active
-        worksheet.title = "Data"
+    # Workbook for raw data
+    workbook = Workbook()
+    worksheet = workbook.active
+    worksheet.title = "Data"
 
     for run in range(MAX_RUN):
         # Parameters
@@ -70,46 +24,115 @@ def main(parameters: dict = None, save: dict = None, file_name: str = "selecting
         USAGE_PROBABILITY = parameters[f"P{run + 1}"]["USAGE_PROBABILITY"]
         MAX_CYCLE = parameters[f"P{run + 1}"]["MAX_CYCLE"]
         # Get the age count for selecting pairs
-        [sock_ages, age_count] = select_pairs(SOCK_COUNT, USAGE_PROBABILITY, MAX_CYCLE, run + 1)
+        sock_ages = select_pairs(SOCK_COUNT, USAGE_PROBABILITY, MAX_CYCLE, run + 1, args["hide_messages"])
 
-        if save["is_save"]:
-            if save["ages"]:
-                save_ages(worksheet, sock_ages, count_old + 1, 1, str(run + 1))
-                count_old += SOCK_COUNT + 2
-            elif save["counts"]:
-                save_counts(worksheet, age_count, count_old + 1, 1, str(run + 1))
-                count_old += len(age_count) + 2
+        save_ages(worksheet, sock_ages, count_old + 1, 1, str(run + 1))
+        worksheet.cell(row=count_old + 1, column=3, value=f"{args['type']} - "
+                                                          f"{parameters[f'P{run + 1}'][args['type']]}")
+        count_old += SOCK_COUNT + 2
 
-        else:
-            if save["ages"]:
-                print(sock_ages)
-            elif save["counts"]:
-                pass
+        # Plot to matplotlib
+        title = f"{parameters[f'P{run + 1}']['SOCK_COUNT']} Socks\n" \
+                f"{parameters[f'P{run + 1}']['MAX_CYCLE']} Cycles\n" \
+                f"{parameters[f'P{run + 1}']['USAGE_PROBABILITY']:.2f} Prob."
 
-    if save["is_save"]:
+        observed = list(sock_ages.values())
+        observed.sort()
+        data = plot_histogram(observed=observed, range_min=0, range_max=MAX_CYCLE,
+                              title=title, path=graph_path, show=args["show"])
+
+        total_data[str(run)] = data
+
         # Save the files with the ending 'FILE_END'
-        workbook.save(FILE_PATH + "selecting_pairs" + FILE_END)
+        workbook.save(FILE_PATH + file_name + FILE_END)
 
-        print(f"The data of 'selecting pair' was saved to '{FILE_PATH + file_name + FILE_END}'.\n\n")
+        # print(f"The data of 'selecting pair' was saved to '{FILE_PATH + file_name + FILE_END}'.\n\n")
+
+    return total_data
+
+
+def main(parameters: dict = None, args: dict = None, file_name: str = "selecting_pairs", graph_path: str = "graphs"):
+    from utility import count_interval_freq
+    from saveDataFunctions import plot_histogram
+    from statisticFunctions import chi_square_test
+
+    if args is None:
+        args = {
+            "type": None,  # Type of the changing parameter
+            "show": False,  # Show plots in the IDE
+            "hide_messages": False,
+        }
+
+    total_data = run_simulation(parameters, args, file_name, graph_path)
+
+    for run in total_data.keys():
+        [bins, observed, normal_exp, uniform_exp, title] = total_data[run]
+
+        observed_freq = count_interval_freq(observed, bins)
+        normal_freq = count_interval_freq(normal_exp, bins)
+        uniform_freq = count_interval_freq(uniform_exp, bins)
+
+        chi_normal = chi_square_test(observed_freq, normal_freq)
+        chi_uniform = chi_square_test(observed_freq, uniform_freq)
+
+        print(
+            f"\n{title}\n"
+            f"Normal Distribution: "
+            f"statistic: {chi_normal[0]}, p: {chi_normal[1]}\n"
+            f"Uniform Distribution: "
+            f"statistic: {chi_uniform[0]}, p: {chi_uniform[1]}"
+        )
 
 
 if __name__ == '__main__':
     import os
+    from time import time
     from utility import parameter_create
     os.system('cls')
 
     # Parameters
-    base_parameters = {
-        "SOCK_COUNT": 50,
-        "USAGE_PROBABILITY": 0.2,
+    save_args = {
+        "type": None,  # Type of the changing parameter (just for naming) - str
+        "show": False,  # Show plots in the IDE - bool
+        "hide_messages": True
+    }
+
+    base_param_sock_count = {
+        "SOCK_COUNT": 10,
+        "USAGE_PROBABILITY": 0.22,
         "MAX_CYCLE": 100,
     }
 
-    save_arg = {
-        "is_save": True,
-        "ages": True,
-        "counts": False
+    base_param_prob = {
+        "SOCK_COUNT": 50,
+        "USAGE_PROBABILITY": 0.00,
+        "MAX_CYCLE": 100,
     }
 
-    parameters_arg = parameter_create("SOCK_COUNT", base_parameters, 3, 10)
-    main(save=save_arg, parameters=parameters_arg, file_name="increased_sock_count")
+    base_param_cycle = {
+        "SOCK_COUNT": 50,
+        "USAGE_PROBABILITY": 0.22,
+        "MAX_CYCLE": 10,
+    }
+
+    start = time()
+    print("Increasing SOCK COUNT")
+    save_args["type"] = "SOCK_COUNT"
+    param_sock_count = parameter_create("SOCK_COUNT", base_param_sock_count, 6, 20)
+    main(args=save_args, parameters=param_sock_count, file_name="increased_sock_count", graph_path="graphs/sock_count/")
+    print(f"Time for the sock count simulation: {time() - start:.2f} seconds\n\n")
+
+    start = time()
+    print("Increasing USAGE_PROBABILITY")
+    save_args["type"] = "USAGE_PROBABILITY"
+    param_prob = parameter_create("USAGE_PROBABILITY", base_param_prob, 6, 0.2)
+    main(args=save_args, parameters=param_prob, file_name="increased_usage_probability",
+         graph_path="graphs/usage_probability/")
+    print(f"Time for the usage probability simulation: {time() - start:.2f} seconds\n\n")
+    
+    start = time()
+    print("Increasing MAX_CYCLE")
+    save_args["type"] = "MAX_CYCLE"
+    param_cycle = parameter_create("MAX_CYCLE", base_param_cycle, 6, 40)
+    main(args=save_args, parameters=param_cycle, file_name="increased_cycle", graph_path="graphs/cycle/")
+    print(f"Time for the max cycle simulation: {time() - start:.2f} seconds\n\n")
