@@ -1,3 +1,6 @@
+from typing import Dict, Optional
+
+
 def run_simulation(parameters: dict, args: dict, file_name: str, graph_path: str):
     from openpyxl import Workbook
     from openpyxl.worksheet.table import Table, TableStyleInfo
@@ -53,7 +56,7 @@ def run_simulation(parameters: dict, args: dict, file_name: str, graph_path: str
 
 def main(parameters: dict = None, args: dict = None, file_name: str = "selecting_pairs", graph_path: str = "graphs"):
     from utility import count_interval_freq
-    from dataSaveFunctions import plot_histogram
+    from dataSaveFunctions import plot_histogram, save_results_to_doc
     from statisticFunctions import chi_square_test
 
     if args is None:
@@ -65,6 +68,7 @@ def main(parameters: dict = None, args: dict = None, file_name: str = "selecting
 
     total_data = run_simulation(parameters, args, file_name, graph_path)
 
+    runs = list()
     for run in total_data.keys():
         [bins, observed, normal_exp, uniform_exp, title] = total_data[run]
 
@@ -75,6 +79,7 @@ def main(parameters: dict = None, args: dict = None, file_name: str = "selecting
         chi_normal = chi_square_test(observed_freq, normal_freq)
         chi_uniform = chi_square_test(observed_freq, uniform_freq)
 
+        # Print the results to the console
         print(
             f"\n{title}\n"
             f"Normal Distribution: "
@@ -82,6 +87,19 @@ def main(parameters: dict = None, args: dict = None, file_name: str = "selecting
             f"Uniform Distribution: "
             f"statistic: {chi_uniform[0]}, p: {chi_uniform[1]}"
         )
+
+        # Save the results to list
+        graph_name = title.replace(",", "")
+        temp = {
+            "parameters": graph_name,
+            "chi_normal": f"statistic: {chi_normal[0]}, p: {chi_normal[1]}\n",
+            "chi_uniform": f"statistic: {chi_uniform[0]}, p: {chi_uniform[1]}"
+        }
+
+        runs.append(temp)
+
+    # Save the list to an .docx file
+    save_results_to_doc(runs, args["type"], graph_path)
 
 
 if __name__ == '__main__':

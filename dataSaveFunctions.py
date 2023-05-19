@@ -107,3 +107,25 @@ def plot_histogram(observed: list, title: str = "Title", path: str = "graphs",
     plt.close()
 
     return [bins, observed, normal_expected, uniform_expected, plt_title]
+
+
+def save_results_to_doc(runs: list, heading: str, path: str):
+    from docx import Document
+    from docx.shared import Inches
+
+    document = Document()
+
+    document.add_heading('Sock Counting', 0)
+
+    document.add_heading(heading, level=1)
+
+    for run in runs:
+        document.add_paragraph(run["parameters"])
+        document.add_paragraph(run["chi_normal"], style='List Bullet')
+        document.add_paragraph(run["chi_uniform"], style='List Bullet')
+
+        document.add_picture(path + run["parameters"] + ".png", width=Inches(4))
+
+        document.add_page_break()
+
+    document.save(path + heading + ".docx")
