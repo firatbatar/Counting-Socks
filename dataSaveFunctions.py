@@ -115,9 +115,7 @@ def save_results_to_doc(runs: list, heading: str, path: str):
 
     document = Document()
 
-    document.add_heading('Sock Counting', 0)
-
-    document.add_heading(heading, level=1)
+    document.add_heading(heading, 0)
 
     for run in runs:
         document.add_paragraph(run["parameters"])
