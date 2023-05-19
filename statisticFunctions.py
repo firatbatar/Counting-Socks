@@ -27,8 +27,9 @@ def normal_dist_expected(observed: list, bins: list):
         expected += [v for _ in range(ceil(total * p))]
 
     expected.sort()
+    expected_mean = statistics.mean(expected)
     while len(observed) > len(expected):
-        expected.append(mean)
+        expected.append(expected_mean)
 
     i = j = -1
     while len(observed) < len(expected):
@@ -54,9 +55,9 @@ def uniform_dist_expected(observed: list, bins: list):
         expected += [v for _ in range(round(count))]
 
     expected.sort()
-    mean = statistics.mean(observed)
+    expected_mean = statistics.mean(expected)
     while len(observed) > len(expected):
-        expected.append(mean)
+        expected.append(expected_mean)
 
     i = j = -1
     while len(observed) < len(expected):
