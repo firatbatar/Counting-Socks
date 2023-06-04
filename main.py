@@ -133,6 +133,7 @@ if __name__ == '__main__':
         "MAX_CYCLE": 10,
     }
 
+    # Sock Count
     start = time()
     print("Increasing SOCK COUNT")
     save_args["type"] = "SOCK_COUNT"
@@ -140,6 +141,7 @@ if __name__ == '__main__':
     main(args=save_args, parameters=param_sock_count, file_name="increased_sock_count", graph_path="graphs/sock_count/")
     print(f"Time for the sock count simulation: {time() - start:.2f} seconds\n\n")
 
+    # Probability of Usage
     start = time()
     print("Increasing USAGE_PROBABILITY")
     save_args["type"] = "USAGE_PROBABILITY"
@@ -147,7 +149,8 @@ if __name__ == '__main__':
     main(args=save_args, parameters=param_prob, file_name="increased_usage_probability",
          graph_path="graphs/usage_probability/")
     print(f"Time for the usage probability simulation: {time() - start:.2f} seconds\n\n")
-    
+
+    # Number of Cycles
     start = time()
     print("Increasing MAX_CYCLE")
     save_args["type"] = "MAX_CYCLE"
